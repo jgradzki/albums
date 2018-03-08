@@ -36,7 +36,7 @@ class Main extends Component {
 	}
 
 	_draw() {
-		const keys = Object.keys(this.props.items)
+		const keys = Object.keys(this.props.items);
 		const count = (this.state.drawCount > keys.length ? keys.length : this.state.drawCount);
 		const drawn = [];
 

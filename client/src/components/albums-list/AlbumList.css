@@ -5,3 +5,40 @@
 .AlbumList {
 
 }
+
+.footer {
+}
+
+.footer .per-page {
+	float: left;
+	display: flex;
+	flex-direction: row;
+}
+
+.footer .per-page .text {
+	 align-self: center;
+}
+.footer .per-page .input-field {
+	 align-self: center;
+	 margin-left: 10px
+}
+
+.footer .pages {
+	float: right;
+	display: flex;
+	flex-direction: row;
+}
+
+.footer .pages .text {
+	 align-self: center;
+}
+
+.footer .pages .input-field {
+	 align-self: center;
+	 margin-left: 10px
+}
+
+.footer .pages .nav {
+	 align-self: center;
+	 margin-right: 15px
+}

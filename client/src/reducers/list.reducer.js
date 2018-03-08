@@ -4,6 +4,7 @@ const listReducer = (state = {}, action) => {
 	switch (action.type) {
 		case 'setLoaded':
 			return {
+				...state,
 				loaded: true,
 				items: action.items
 			}
@@ -40,6 +41,16 @@ const listReducer = (state = {}, action) => {
 				...state,
 				draw: false,
 				drawnItems: []
+			}
+		case 'setPerPage':
+			return {
+				...state,
+				perPage: action.count
+			}
+		case 'setPage':
+			return {
+				...state,
+				page: action.page
 			}
 		default:
 			return state;

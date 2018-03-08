@@ -13,7 +13,9 @@ const store = createStore(reducers,
 		appState: {},
 		list: {
 			loaded: false,
-			items: {}
+			items: {},
+			perPage: 25,
+			page: 1
 		}
 	},
 	process.env.NODE_ENV !== 'production' ? window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__() : undefined

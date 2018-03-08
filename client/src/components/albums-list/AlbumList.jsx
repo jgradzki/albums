@@ -11,16 +11,20 @@ import {
 	TableRowColumn,
 	TableFooter
 } from 'material-ui/Table';
+import TextField from 'material-ui/TextField';
 import CircularProgress from 'material-ui/CircularProgress';
 import IconButton from 'material-ui/IconButton';
 import ActionDelete from 'material-ui/svg-icons/action/delete';
 import ImageEdit from 'material-ui/svg-icons/image/edit';
+import NavigationChevronLeft from 'material-ui/svg-icons/navigation/chevron-left';
+import NavigationChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import {blue500, red500} from 'material-ui/styles/colors';
 
 class AlbumList extends Component {
 	state = {
 		height: window.innerHeight,
-		error: false
+		error: false,
+		page: this.props.list.page || 0
 	}
 
 	componentDidMount() {
@@ -82,6 +86,8 @@ class AlbumList extends Component {
 	}
 
 	_renderList() {
+		const { page } = this.props.list;
+		const { items, pagesCount } = this._getList();
 		let number = 0;
 
 		return (
@@ -106,15 +112,45 @@ class AlbumList extends Component {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{map(this._getList(), (item, id) => {
+						{map(items, (item, id) => {
 							number++;
 							return this._renderItem(item, id, number);
 						})}
 					</TableBody>
 					<TableFooter>
 						<TableRow>
-							<TableRowColumn colSpan="3" style={{textAlign: 'center'}}>
-							Super Footer
+							<TableRowColumn colSpan="3" className="footer">
+								<div className="per-page">
+									<div className="text">Na strone:</div>
+									<div className="input-field">
+										<TextField 
+											id="per-page-count"
+											style={{width: '30px'}}
+											value={this.props.list.perPage || ''}
+											onChange={event => this._setPerPageCount(event.target.value)}
+										/>
+									</div>
+								</div>
+								<div className="pages">
+									<div className="nav">
+										<IconButton>
+											<NavigationChevronLeft color={blue500} onClick={() => {this._setPage(page - 1)}} />
+										</IconButton>
+										<IconButton>
+											<NavigationChevronRight color={blue500} onClick={() => {this._setPage(page + 1)}} />
+										</IconButton>
+									</div>
+									<div className="text">Strona</div>
+									<div className="input-field">
+										<TextField 
+											id="page-number"
+											style={{width: '30px'}}
+											value={this.state.page}
+											onChange={event => this._onPageInputChange(event.target.value)}
+										/>
+									</div>
+									<div className="text">z {pagesCount}</div>
+								</div>
 							</TableRowColumn>
 						</TableRow>
 					</TableFooter>
@@ -124,20 +160,72 @@ class AlbumList extends Component {
 	}
 
 	_getList() {
+		const { items, perPage, page } = this.props.list;
+		let toShow = {};
+
 		if (!this.props.list.draw) {
-			return this.props.list.items;
-		}
-
-		const items = this.props.list.items;
-		const drawn = {};
-
-		for (const key in items) {
-			if (items.hasOwnProperty(key) && find(this.props.list.drawnItems, drawnItem => drawnItem === key)) {
-				drawn[key] = items[key];
+			toShow = items;
+		} else {
+			for (const key in items) {
+				if (items.hasOwnProperty(key) && find(this.props.list.drawnItems, drawnItem => drawnItem === key)) {
+					toShow[key] = items[key];
+				}
 			}
 		}
 
-		return drawn;
+		const keys = Object.keys(toShow);
+		const start = 0 + (perPage * (page - 1));
+		const end = perPage + (perPage * (page - 1)) - 1;
+
+		if (keys.length > perPage) {
+			const pageList = {};
+
+			keys.forEach((key,index) => {
+				if ( (index >= start) && (index <= end) ) {
+					pageList[key] = toShow[key];
+				}
+			});
+
+			toShow = pageList;
+		}
+
+		return {items: toShow, pagesCount: Math.ceil(keys.length / perPage)};
+	}
+
+	_onPageInputChange(page) {
+		this.setState({page});
+		this._setPage(page);
+	}
+
+	_setPerPageCount(count) {
+		count = parseInt(count, 10);
+		
+		if (isNaN(count)) {
+			count = null;
+		}
+
+		this.props.setPerPage(count);
+	}
+
+	_setPage(page) {
+		const { pagesCount } = this._getList();
+		page = parseInt(page, 10);
+
+		if(isNaN(page)) {
+			return;
+		}
+
+		if (page < 1) {
+			page = 1;
+		}
+		if (page > pagesCount) {
+			page = pagesCount;
+		}
+		
+		this.props.setPage(page);
+		this.setState({
+			page
+		});
 	}
 
 	_remove(id) {
@@ -173,6 +261,12 @@ let mapDispatchToProps = (dispatch) => {
 		},
 		editItem: id => {
 			dispatch({type: 'showEditDialog', id}); 
+		},
+		setPerPage: count => {
+			dispatch({type: 'setPerPage', count}); 		
+		},
+		setPage: page => {
+			dispatch({type: 'setPage', page}); 		
 		}
 	};
 };
