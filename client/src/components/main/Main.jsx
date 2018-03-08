@@ -43,8 +43,8 @@ class Main extends Component {
 		while (drawn.length < count) {
 			const i = random(0,  items.length - 1);
 
-			if (!find(drawn, drawnItem => drawnItem === items[i].id)) {
-				drawn.push(items[i].id);
+			if (!find(drawn, drawnItem => drawnItem.id === items[i].id)) {
+				drawn.push(items[i]);
 			}		
 		}
 

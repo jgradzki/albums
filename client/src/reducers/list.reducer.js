@@ -19,7 +19,8 @@ const listReducer = (state = {}, action) => {
 		case 'removeItem': 
 			return {
 				...state,
-				items: filter(state.items, (item, key) => item.id !== action.id)
+				items: filter(state.items, (item, key) => item.id !== action.id),
+				drawnItems: filter(state.drawnItems, (item, key) => item.id !== action.id)
 			}
 		case 'editItem':
 			return {

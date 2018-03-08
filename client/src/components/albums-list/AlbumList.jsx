@@ -159,13 +159,13 @@ class AlbumList extends Component {
 	}
 
 	_getList() {
-		const { items, perPage, page } = this.props.list;
+		const { items, perPage, page, drawnItems } = this.props.list;
 		let toShow = {};
 
 		if (!this.props.list.draw) {
 			toShow = items;
 		} else {
-			toShow = filter(items, item => find(this.props.list.drawnItems, drawnItem => drawnItem === item.id));
+			toShow = drawnItems;
 		}
 
 		const length = toShow.length;
