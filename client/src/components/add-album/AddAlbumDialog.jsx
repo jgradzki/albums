@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { map } from 'lodash';
+import { map, reduce, find } from 'lodash';
 import './AddAlbumDialog.css';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
@@ -82,14 +82,16 @@ class AddAlbumDialog extends Component {
 				<AutoComplete
 					floatingLabelText="Zespół"
 					onUpdateInput={value => this.setState({band: value})}
-					//filter={AutoComplete.caseInsensitiveFilter}
-					dataSource={[]}
+					filter={AutoComplete.caseInsensitiveFilter}
+					dataSource={this._getDataSource('band')}
+					maxSearchResults={5}
 				/>
 				<AutoComplete
 					floatingLabelText="Tytuł albumu"
 					onUpdateInput={value => this.setState({title: value})}
-					//filter={AutoComplete.caseInsensitiveFilter}
-					dataSource={[]}
+					filter={AutoComplete.caseInsensitiveFilter}
+					dataSource={this._getDataSource('title')}
+					maxSearchResults={5}
 				/>
 			</div>
 			<div className="form-row">
@@ -113,8 +115,9 @@ class AddAlbumDialog extends Component {
 				<AutoComplete
 					floatingLabelText="Wydawca"
 					onUpdateInput={value => this.setState({publisher: value})}
-					//filter={AutoComplete.caseInsensitiveFilter}
-					dataSource={[]}
+					filter={AutoComplete.caseInsensitiveFilter}
+					dataSource={this._getDataSource('publisher')}
+					maxSearchResults={5}
 				/>
 			</div>
 			<TextField
@@ -124,11 +127,23 @@ class AddAlbumDialog extends Component {
 			/>
 		</div>);
 	}
+
+	_getDataSource(key) {
+		return reduce(this.props.items, function(all, item) {
+			if (find(all, i => i === item[key])) {
+				return all;
+			}
+
+			all.push(item[key]);
+			return all;
+		}, [])
+	}
 }
 
 let mapStateToProps = (state, props) => {
 	return {
-		show: state.appState.showAddDialog || false
+		show: state.appState.showAddDialog || false,
+		items: state.list.items || {}
 	};
 };
 

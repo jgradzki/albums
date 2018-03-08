@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { map } from 'lodash';
+import { map, reduce, find } from 'lodash';
 import './EditAlbumDialog.css';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
@@ -103,15 +103,17 @@ class EditAlbumDialog extends Component {
 				<AutoComplete
 					floatingLabelText="Zespół"
 					onUpdateInput={value => this.setState({band: value})}
-					//filter={AutoComplete.caseInsensitiveFilter}
-					dataSource={[]}
+					filter={AutoComplete.caseInsensitiveFilter}
+					dataSource={this._getDataSource('band')}
+					maxSearchResults={5}
 					searchText={this.state.band}
 				/>
 				<AutoComplete
 					floatingLabelText="Tytuł albumu"
 					onUpdateInput={value => this.setState({title: value})}
-					//filter={AutoComplete.caseInsensitiveFilter}
-					dataSource={[]}
+					filter={AutoComplete.caseInsensitiveFilter}
+					dataSource={this._getDataSource('title')}
+					maxSearchResults={5}
 					searchText={this.state.title}
 				/>
 			</div>
@@ -138,8 +140,9 @@ class EditAlbumDialog extends Component {
 				<AutoComplete
 					floatingLabelText="Wydawca"
 					onUpdateInput={value => this.setState({publisher: value})}
-					//filter={AutoComplete.caseInsensitiveFilter}
-					dataSource={[]}
+					filter={AutoComplete.caseInsensitiveFilter}
+					dataSource={this._getDataSource('publisher')}
+					maxSearchResults={5}
 					searchText={this.state.publisher}
 				/>
 			</div>
@@ -151,13 +154,25 @@ class EditAlbumDialog extends Component {
 			/>
 		</div>);
 	}
+
+	_getDataSource(key) {
+		return reduce(this.props.items, function(all, item) {
+			if (find(all, i => i === item[key])) {
+				return all;
+			}
+
+			all.push(item[key]);
+			return all;
+		}, [])
+	}
 }
 
 let mapStateToProps = (state, props) => {
 	return {
 		show: state.appState.showEditDialog || false,
 		item: state.list.items[state.appState.editId] || null,
-		editId: state.appState.editId || null
+		editId: state.appState.editId || null,
+		items: state.list.items || {}
 	};
 };
 

@@ -88,7 +88,7 @@ class AlbumList extends Component {
 			<div className="AlbumList">
 				<Table 
 					selectable={false} 
-					height={this.state.height-327} 
+					height={`${this.state.height-327}px`} 
 					fixedHeader={true}
 					fixedFooter={true}
 				>
