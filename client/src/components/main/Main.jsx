@@ -36,15 +36,15 @@ class Main extends Component {
 	}
 
 	_draw() {
-		const keys = Object.keys(this.props.items);
-		const count = (this.state.drawCount > keys.length ? keys.length : this.state.drawCount);
+		const { items } = this.props;
+		const count = (this.state.drawCount > items.length ? items.length : this.state.drawCount);
 		const drawn = [];
 
 		while (drawn.length < count) {
-			const i = random(0,  keys.length - 1);
+			const i = random(0,  items.length - 1);
 
-			if (!find(drawn, drawnItem => drawnItem === keys[i])) {
-				drawn.push(keys[i]);
+			if (!find(drawn, drawnItem => drawnItem === items[i].id)) {
+				drawn.push(items[i].id);
 			}		
 		}
 

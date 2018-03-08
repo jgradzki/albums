@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { map, find } from 'lodash';
+import { map, find, filter } from 'lodash';
 import './AlbumList.css';
 import {
 	Table,
@@ -34,7 +34,10 @@ class AlbumList extends Component {
 			.then(response => response.json())
 			.then(results => {
 				if (results.success) {
-					this.props.setLoaded(results.data || {});
+					this.props.setLoaded(map(results.data || {}, (item, key) => ({
+						...item,
+						id: key
+					})));
 				}
 			})
 			.catch(error => {
@@ -64,7 +67,7 @@ class AlbumList extends Component {
 		}
 	}
 
-	_renderItem(item, id, number) {
+	_renderItem(item, number) {
 		return (<TableRow key={number}>
 			<TableRowColumn>{number}</TableRowColumn>
 			<TableRowColumn>{item.band}</TableRowColumn>
@@ -76,10 +79,10 @@ class AlbumList extends Component {
 			<TableRowColumn>{item.desc}</TableRowColumn>
 			<TableRowColumn>
 				<IconButton>
-					<ImageEdit color={blue500} onClick={() => this.props.editItem(id)} />
+					<ImageEdit color={blue500} onClick={() => this.props.editItem(item.id)} />
 				</IconButton>
 				<IconButton>
-					<ActionDelete color={red500} onClick={() => this._remove(id)} />
+					<ActionDelete color={red500} onClick={() => this._remove(item.id)} />
 				</IconButton>
 			</TableRowColumn>
 		</TableRow>);
@@ -88,7 +91,6 @@ class AlbumList extends Component {
 	_renderList() {
 		const { page } = this.props.list;
 		const { items, pagesCount } = this._getList();
-		let number = 0;
 
 		return (
 			<div className="AlbumList">
@@ -112,10 +114,7 @@ class AlbumList extends Component {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{map(items, (item, id) => {
-							number++;
-							return this._renderItem(item, id, number);
-						})}
+						{map(items, (item, number) => this._renderItem(item, number+1))}
 					</TableBody>
 					<TableFooter>
 						<TableRow>
@@ -166,30 +165,18 @@ class AlbumList extends Component {
 		if (!this.props.list.draw) {
 			toShow = items;
 		} else {
-			for (const key in items) {
-				if (items.hasOwnProperty(key) && find(this.props.list.drawnItems, drawnItem => drawnItem === key)) {
-					toShow[key] = items[key];
-				}
-			}
+			toShow = filter(items, item => find(this.props.list.drawnItems, drawnItem => drawnItem === item.id));
 		}
 
-		const keys = Object.keys(toShow);
+		const length = toShow.length;
 		const start = 0 + (perPage * (page - 1));
 		const end = perPage + (perPage * (page - 1)) - 1;
 
-		if (keys.length > perPage) {
-			const pageList = {};
-
-			keys.forEach((key,index) => {
-				if ( (index >= start) && (index <= end) ) {
-					pageList[key] = toShow[key];
-				}
-			});
-
-			toShow = pageList;
+		if (length > perPage) {
+			toShow = filter(toShow, (item, index) => (index >= start) && (index <= end));
 		}
 
-		return {items: toShow, pagesCount: Math.ceil(keys.length / perPage)};
+		return {items: toShow, pagesCount: Math.ceil(length / perPage)};
 	}
 
 	_onPageInputChange(page) {

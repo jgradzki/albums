@@ -1,4 +1,4 @@
-import { pickBy } from 'lodash';
+import { filter, slice, map } from 'lodash';
 
 const listReducer = (state = {}, action) => {
 	switch (action.type) {
@@ -9,26 +9,28 @@ const listReducer = (state = {}, action) => {
 				items: action.items
 			}
 		case 'addItem': 
+			const items = slice(state.items);
+			items.push(action.item);
+
 			return {
 				...state,
-				items: {
-					...state.items,
-					[action.id]: action.item
-				}
-				
+				items
 			}
 		case 'removeItem': 
 			return {
 				...state,
-				items: pickBy(state.items, (item, key) => key !== action.id)
+				items: filter(state.items, (item, key) => item.id !== action.id)
 			}
 		case 'editItem':
 			return {
 				...state,
-				items: {
-					...state.items,
-					[action.id]: action.item
-				}
+				items: map(state.items, item => {
+					if (item.id === action.item.id) {
+						return action.item;
+					}
+
+					return item;
+				})
 			}
 		case 'setDrawn': 
 			return {

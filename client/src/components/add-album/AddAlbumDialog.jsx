@@ -66,7 +66,7 @@ class AddAlbumDialog extends Component {
 			.then(response => response.json())
 			.then(results => {
 				if (results.success && results.id) {
-					this.props.addItem(results.id, this.state);
+					this.props.addItem({...this.state, id: results.id});
 				}
 
 				this.props.hideAddDialog();
@@ -152,8 +152,8 @@ let mapDispatchToProps = (dispatch) => {
 		hideAddDialog: () => {
 			dispatch({type: 'hideAddDialog'}); 
 		},
-		addItem: (id, item) => {
-			dispatch({type: 'addItem', id, item});
+		addItem: (item) => {
+			dispatch({type: 'addItem', item});
 		}
 	};
 };

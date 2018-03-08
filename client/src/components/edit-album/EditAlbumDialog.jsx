@@ -87,7 +87,7 @@ class EditAlbumDialog extends Component {
 			.then(response => response.json())
 			.then(results => {
 				if (results.success && results.id) {
-					this.props.editItem(this.props.editId, this.state);
+					this.props.editItem({...this.state, id: results.id});
 				}
 
 				this.props.hideEditDialog();
@@ -170,7 +170,7 @@ class EditAlbumDialog extends Component {
 let mapStateToProps = (state, props) => {
 	return {
 		show: state.appState.showEditDialog || false,
-		item: state.list.items[state.appState.editId] || null,
+		item: find(state.list.items, album => album.id === state.appState.editId),
 		editId: state.appState.editId || null,
 		items: state.list.items || {}
 	};
@@ -181,8 +181,8 @@ let mapDispatchToProps = (dispatch) => {
 		hideEditDialog: () => {
 			dispatch({type: 'hideEditDialog'}); 
 		},
-		editItem: (id, item) => {
-			dispatch({type: 'editItem', id, item});
+		editItem: (item) => {
+			dispatch({type: 'editItem', item});
 		}
 	};
 };
