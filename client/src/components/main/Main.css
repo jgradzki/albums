@@ -26,3 +26,9 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.search {
+  position: absolute;
+  left: 30px;
+  top: 145px;
+}

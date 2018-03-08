@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { map, find, filter } from 'lodash';
+import { map, filter, slice } from 'lodash';
 import './AlbumList.css';
 import {
 	Table,
@@ -160,6 +160,7 @@ class AlbumList extends Component {
 
 	_getList() {
 		const { items, perPage, page, drawnItems } = this.props.list;
+		const { searchText } = this.props;
 		let toShow = {};
 
 		if (!this.props.list.draw) {
@@ -168,12 +169,24 @@ class AlbumList extends Component {
 			toShow = drawnItems;
 		}
 
+		if (searchText) {
+			toShow = filter(
+				toShow, 
+				item => 
+					(item.band.toLowerCase().search(searchText.toLowerCase()) > -1) ||
+					(item.title.toLowerCase().search(searchText.toLowerCase()) > -1) ||
+					(item.year.toLowerCase().search(searchText.toLowerCase()) > -1) ||
+					(item.pubYear.toLowerCase().search(searchText.toLowerCase()) > -1) ||
+					(item.publisher.toLowerCase().search(searchText.toLowerCase()) > -1)
+			)
+		}
+
 		const length = toShow.length;
 		const start = 0 + (perPage * (page - 1));
-		const end = perPage + (perPage * (page - 1)) - 1;
+		const end = perPage + (perPage * (page - 1));
 
 		if (length > perPage) {
-			toShow = filter(toShow, (item, index) => (index >= start) && (index <= end));
+			toShow = slice(toShow, start, end);
 		}
 
 		return {items: toShow, pagesCount: Math.ceil(length / perPage)};
@@ -192,6 +205,7 @@ class AlbumList extends Component {
 		}
 
 		this.props.setPerPage(count);
+		this.setState({page: 1});
 	}
 
 	_setPage(page) {
@@ -234,7 +248,8 @@ class AlbumList extends Component {
 
 let mapStateToProps = (state, props) => {
 	return {
-		list: state.list
+		list: state.list,
+		searchText: state.appState.searchText
 	};
 };
 

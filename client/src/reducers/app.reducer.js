@@ -25,6 +25,11 @@ const appReducer = (state = {}, action) => {
 				showEditDialog: false,
 				editId: null
 			}
+		case 'setSearchText':
+			return {
+				...state,
+				searchText: action.text
+			}
 		default:
 			return state;
 	}

@@ -9,6 +9,7 @@ import TextField from 'material-ui/TextField';
 import AlbumList from '../albums-list';
 import AddAlbumDialog from '../add-album';
 import EditAlbumDialog from '../edit-album';
+import Search from '../search';
 
 class Main extends Component {
 	state = {
@@ -23,6 +24,9 @@ class Main extends Component {
 					<h1 className="App-title">Albums</h1>
 				</header>
 				<div className="App-intro">
+					<div className="search">
+						<Search />
+					</div>
 					<RaisedButton label="Dodaj album" primary={true} onClick={() => this.props.showAddDialog()} style={{height: 'auto'}} />
 					<FlatButton label="Losuj: " onClick={() => this._draw()} /> 
 					<TextField id="drawn-count" value={this.state.drawCount} style={{width: '40px'}} onChange={event => this.setState({drawCount: parseInt(event.target.value, 10)})} />
