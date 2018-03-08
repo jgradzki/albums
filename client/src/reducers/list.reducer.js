@@ -29,6 +29,18 @@ const listReducer = (state = {}, action) => {
 					[action.id]: action.item
 				}
 			}
+		case 'setDrawn': 
+			return {
+				...state,
+				draw: true,
+				drawnItems: action.drawn
+			}
+		case 'reset': 
+			return {
+				...state,
+				draw: false,
+				drawnItems: []
+			}
 		default:
 			return state;
 	}

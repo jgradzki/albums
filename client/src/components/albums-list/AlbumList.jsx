@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { map } from 'lodash';
+import { map, find } from 'lodash';
 import './AlbumList.css';
 import {
 	Table,
@@ -106,7 +106,7 @@ class AlbumList extends Component {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{map(this.props.list.items, (item, id) => {
+						{map(this._getList(), (item, id) => {
 							number++;
 							return this._renderItem(item, id, number);
 						})}
@@ -121,6 +121,23 @@ class AlbumList extends Component {
 				</Table>
 			</div>
 		);
+	}
+
+	_getList() {
+		if (!this.props.list.draw) {
+			return this.props.list.items;
+		}
+
+		const items = this.props.list.items;
+		const drawn = {};
+
+		for (const key in items) {
+			if (items.hasOwnProperty(key) && find(this.props.list.drawnItems, drawnItem => drawnItem === key)) {
+				drawn[key] = items[key];
+			}
+		}
+
+		return drawn;
 	}
 
 	_remove(id) {

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { random, find } from 'lodash';
 import logo from './logo.svg';
 import './Main.css';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -10,6 +11,10 @@ import AddAlbumDialog from '../add-album';
 import EditAlbumDialog from '../edit-album';
 
 class Main extends Component {
+	state = {
+		drawCount: 1
+	}
+
 	render() {
 		return (
 			<div className="App">
@@ -19,9 +24,9 @@ class Main extends Component {
 				</header>
 				<div className="App-intro">
 					<RaisedButton label="Dodaj album" primary={true} onClick={() => this.props.showAddDialog()} style={{height: 'auto'}} />
-					<FlatButton label="Losuj: " /> 
-					<TextField defaultValue={1} style={{width: '40px'}} name="rand_count" />
-					<FlatButton label="Resetuj" /> 
+					<FlatButton label="Losuj: " onClick={() => this._draw()} /> 
+					<TextField id="drawn-count" value={this.state.drawCount} style={{width: '40px'}} onChange={event => this.setState({drawCount: parseInt(event.target.value, 10)})} />
+					<FlatButton label="Resetuj" onClick={() => this.props.reset()} /> 
 					<AlbumList />
 				</div>
 				<AddAlbumDialog />
@@ -29,16 +34,41 @@ class Main extends Component {
 			</div>		
 		);
 	}
+
+	_draw() {
+		const keys = Object.keys(this.props.items)
+		const count = (this.state.drawCount > keys.length ? keys.length : this.state.drawCount);
+		const drawn = [];
+
+		while (drawn.length < count) {
+			const i = random(0,  keys.length - 1);
+
+			if (!find(drawn, drawnItem => drawnItem === keys[i])) {
+				drawn.push(keys[i]);
+			}		
+		}
+
+		this.props.setDrawn(drawn);
+	}
+
 }
 
 let mapStateToProps = (state, props) => {
-	return {};
+	return {
+		items: state.list.items || {}
+	};
 };
 
 let mapDispatchToProps = (dispatch) => {
 	return {
 		showAddDialog: () => {
 			dispatch({type: 'showAddDialog'}); 
+		},
+		setDrawn: drawn => {
+			dispatch({type: 'setDrawn', drawn})
+		},
+		reset: drawn => {
+			dispatch({type: 'reset'})
 		}
 	};
 };
