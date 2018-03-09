@@ -98,7 +98,14 @@ class AlbumList extends Component {
 			<TableRowColumn>{item.format}</TableRowColumn>
 			<TableRowColumn>{item.pubYear}</TableRowColumn>
 			<TableRowColumn>{item.publisher}</TableRowColumn>
-			<TableRowColumn>{item.desc}</TableRowColumn>
+			<TableRowColumn 
+				style={{
+					whiteSpace: "normal",
+					wordWrap: "break-word"
+				}}
+             >
+             	{item.desc}
+             </TableRowColumn>
 			<TableRowColumn>
 				<IconButton>
 					<ImageEdit color={blue500} onClick={() => this.props.editItem(item.id)} />
@@ -342,6 +349,8 @@ class AlbumList extends Component {
 	}
 
 	_remove(id) {
+		this.props.setServerWait(true);
+
 		fetch("/api/item", {
 			method: 'DELETE',
 			body: JSON.stringify({id}), 
@@ -354,6 +363,10 @@ class AlbumList extends Component {
 				if (results.success) {
 					this.props.removeItem(id);
 				}
+				this.props.setServerWait(false);
+			})
+			.catch(error => {
+				this.props.setServerWait(false);
 			});
 	}
 }
@@ -384,6 +397,9 @@ const mapDispatchToProps = (dispatch) => {
 		},
 		switchOrder: category => {
 			dispatch({type: 'switchOrder', category}); 		
+		},
+		setServerWait: status => {
+			dispatch({type: 'setServerWait', status});			
 		}
 	};
 };

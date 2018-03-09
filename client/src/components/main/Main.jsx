@@ -10,6 +10,7 @@ import AlbumList from '../albums-list';
 import AddAlbumDialog from '../add-album';
 import EditAlbumDialog from '../edit-album';
 import Search from '../search';
+import Wait from '../wait';
 
 class Main extends Component {
 	state = {
@@ -32,6 +33,7 @@ class Main extends Component {
 					<TextField id="drawn-count" value={this.state.drawCount} style={{width: '40px'}} onChange={event => this.setState({drawCount: parseInt(event.target.value, 10)})} />
 					<FlatButton label="Resetuj" onClick={() => this.props.reset()} /> 
 					<AlbumList />
+					<Wait show={this.props.serverWait} />
 				</div>
 				<AddAlbumDialog />
 				<EditAlbumDialog />
@@ -59,7 +61,8 @@ class Main extends Component {
 
 const mapStateToProps = (state, props) => {
 	return {
-		items: state.list.items || {}
+		items: state.list.items || {},
+		serverWait: state.appState.serverWait || false
 	};
 };
 

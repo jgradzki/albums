@@ -8,17 +8,21 @@ import AutoComplete from 'material-ui/AutoComplete';
 import Dialog from 'material-ui/Dialog';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import Wait from '../wait';
 import { formats } from '../../constants';
 
 class AddAlbumDialog extends Component {
 	state = {
-		band: '',
-		title: '',
-		year: '',
-		format: 'CD',
-		pubYear: '',
-		publisher: '',
-		desc: ''
+		form: {
+			band: '',
+			title: '',
+			year: '',
+			format: 'CD',
+			pubYear: '',
+			publisher: '',
+			desc: ''
+		},
+		wait: false
 	}
 
 	render() {
@@ -56,9 +60,11 @@ class AddAlbumDialog extends Component {
 			return;
 		}
 
+		this._wait(true);
+
 		fetch("/api/item", {
 			method: 'POST',
-			body: JSON.stringify(this.state), 
+			body: JSON.stringify(this.state.form), 
 			headers: new Headers({
 				'Content-Type': 'application/json'
 			})
@@ -66,29 +72,41 @@ class AddAlbumDialog extends Component {
 			.then(response => response.json())
 			.then(results => {
 				if (results.success && results.id) {
-					this.props.addItem({...this.state, id: results.id});
+					this.props.addItem({...this.state.form, id: results.id});
 				}
-
+				this._wait(false);
 				this.props.hideAddDialog();
 			})
 			.catch(error => {
+				this._wait(false);
 				this.props.hideAddDialog();
 			})
 	};
 
 	_renderForm() {
 		return (<div className="form">
+			<Wait show={this.state.wait} />
 			<div className="form-row">
 				<AutoComplete
 					floatingLabelText="Zespół"
-					onUpdateInput={value => this.setState({band: value})}
+					onUpdateInput={value => this.setState({
+						form: { 
+							...this.state.form,
+							band: value
+						} 
+					})}
 					filter={AutoComplete.caseInsensitiveFilter}
 					dataSource={this._getDataSource('band')}
 					maxSearchResults={5}
 				/>
 				<AutoComplete
 					floatingLabelText="Tytuł albumu"
-					onUpdateInput={value => this.setState({title: value})}
+					onUpdateInput={value => this.setState({
+						form: { 
+							...this.state.form,
+							title: value
+						} 
+					})}
 					filter={AutoComplete.caseInsensitiveFilter}
 					dataSource={this._getDataSource('title')}
 					maxSearchResults={5}
@@ -97,12 +115,22 @@ class AddAlbumDialog extends Component {
 			<div className="form-row">
 				<TextField
 					floatingLabelText="Rok premiery"
-					onChange={event => this.setState({year: event.target.value})}
+					onChange={event => this.setState({
+						form: { 
+							...this.state.form,
+							year: event.target.value
+						} 
+					})}
 				/>
 				<SelectField
 					floatingLabelText="Format wydania"
-					value={this.state.format}
-					onChange={(event, index, value) => this.setState({format: value})}
+					value={this.state.form.format}
+					onChange={(event, index, value) => this.setState({
+						form: { 
+							...this.state.form,
+							format: value
+						} 
+					})}
 				>
 					{map(formats, format => <MenuItem key={format} value={format} primaryText={format} />)}
 				</SelectField>			
@@ -110,11 +138,21 @@ class AddAlbumDialog extends Component {
 			<div className="form-row">
 				<TextField
 					floatingLabelText="Rok wydawnictwa"
-					onChange={event => this.setState({pubYear: event.target.value})}
+					onChange={event => this.setState({
+						form: { 
+							...this.state.form,
+							pubYear: event.target.value
+						} 
+					})}
 				/>
 				<AutoComplete
 					floatingLabelText="Wydawca"
-					onUpdateInput={value => this.setState({publisher: value})}
+					onUpdateInput={value => this.setState({
+						form: { 
+							...this.state.form,
+							publisher: value
+						} 
+					})}
 					filter={AutoComplete.caseInsensitiveFilter}
 					dataSource={this._getDataSource('publisher')}
 					maxSearchResults={5}
@@ -123,7 +161,12 @@ class AddAlbumDialog extends Component {
 			<TextField
 				floatingLabelText="Opis"
 				fullWidth={true}
-				onChange={event => this.setState({desc: event.target.value})}
+				onChange={event => this.setState({
+					form: { 
+						...this.state.form,
+						desc: event.target.value
+					} 
+				})}
 			/>
 		</div>);
 	}
@@ -137,6 +180,10 @@ class AddAlbumDialog extends Component {
 			all.push(item[key]);
 			return all;
 		}, [])
+	}
+
+	_wait(show = false) {
+		this.setState({wait: show});
 	}
 }
 
@@ -152,7 +199,7 @@ const mapDispatchToProps = (dispatch) => {
 		hideAddDialog: () => {
 			dispatch({type: 'hideAddDialog'}); 
 		},
-		addItem: (item) => {
+		addItem: item => {
 			dispatch({type: 'addItem', item});
 		}
 	};

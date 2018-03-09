@@ -30,6 +30,11 @@ const appReducer = (state = {}, action) => {
 				...state,
 				searchText: action.text
 			}
+		case 'setServerWait':
+			return {
+				...state,
+				serverWait: action.status || false
+			}
 		default:
 			return state;
 	}

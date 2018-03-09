@@ -8,29 +8,36 @@ import AutoComplete from 'material-ui/AutoComplete';
 import Dialog from 'material-ui/Dialog';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import Wait from '../wait';
 import { formats } from '../../constants';
 
 class EditAlbumDialog extends Component {
 	state = {
-		band: '',
-		title: '',
-		year: '',
-		format: 'CD',
-		pubYear: '',
-		publisher: '',
-		desc: ''
+		form: {
+			band: '',
+			title: '',
+			year: '',
+			format: 'CD',
+			pubYear: '',
+			publisher: '',
+			desc: ''
+		},
+		wait: false
 	}
 	
 	componentDidUpdate(prevProps, prevState) {
 		if (!prevProps.show && this.props.show) {
 			this.setState({
-				band: this.props.item.band || '',
-				title: this.props.item.title || '',
-				year: this.props.item.year || '',
-				format: this.props.item.format || '',
-				pubYear: this.props.item.pubYear || '',
-				publisher: this.props.item.publisher || '',
-				desc: this.props.item.desc || ''
+				...this.state,
+				form: {
+					band: this.props.item.band || '',
+					title: this.props.item.title || '',
+					year: this.props.item.year || '',
+					format: this.props.item.format || '',
+					pubYear: this.props.item.pubYear || '',
+					publisher: this.props.item.publisher || '',
+					desc: this.props.item.desc || ''
+				}
 			});
 		}
 	}
@@ -74,11 +81,13 @@ class EditAlbumDialog extends Component {
 			return;
 		}
 
+		this._wait(true);
+
 		fetch("/api/item", {
 			method: 'PUT',
 			body: JSON.stringify({
 				id: this.props.editId, 
-				item: this.state
+				item: this.state.form
 			}), 
 			headers: new Headers({
 				'Content-Type': 'application/json'
@@ -87,46 +96,69 @@ class EditAlbumDialog extends Component {
 			.then(response => response.json())
 			.then(results => {
 				if (results.success && results.id) {
-					this.props.editItem({...this.state, id: results.id});
+					this.props.editItem({...this.state.form, id: results.id});
 				}
 
+				this._wait(false);
 				this.props.hideEditDialog();
 			})
 			.catch(error => {
+				this._wait(false);
 				this.props.hideEditDialog();
 			})
 	};
 
 	_renderForm() {
 		return (<div className="form">
+			<Wait show={this.state.wait} />
 			<div className="form-row">
 				<AutoComplete
 					floatingLabelText="Zespół"
-					onUpdateInput={value => this.setState({band: value})}
+					onUpdateInput={value => this.setState({
+						form: { 
+							...this.state.form,
+							band: value
+						} 
+					})}
 					filter={AutoComplete.caseInsensitiveFilter}
 					dataSource={this._getDataSource('band')}
 					maxSearchResults={5}
-					searchText={this.state.band}
+					searchText={this.state.form.band}
 				/>
 				<AutoComplete
 					floatingLabelText="Tytuł albumu"
-					onUpdateInput={value => this.setState({title: value})}
+					onUpdateInput={value => this.setState({
+						form: { 
+							...this.state.form,
+							title: value
+						} 
+					})}
 					filter={AutoComplete.caseInsensitiveFilter}
 					dataSource={this._getDataSource('title')}
 					maxSearchResults={5}
-					searchText={this.state.title}
+					searchText={this.state.form.title}
 				/>
 			</div>
 			<div className="form-row">
 				<TextField
 					floatingLabelText="Rok premiery"
-					onChange={event => this.setState({year: event.target.value})}
-					defaultValue={this.state.year}
+					onChange={event => this.setState({
+						form: { 
+							...this.state.form,
+							year: event.target.value
+						} 
+					})}
+					defaultValue={this.state.form.year}
 				/>
 				<SelectField
 					floatingLabelText="Format wydania"
-					value={this.state.format}
-					onChange={(event, index, value) => this.setState({format: value})}
+					value={this.state.form.format}
+					onChange={(event, index, value) => this.setState({
+						form: { 
+							...this.state.form,
+							format: value
+						} 
+					})}
 				>
 					{map(formats, format => <MenuItem key={format} value={format} primaryText={format} />)}
 				</SelectField>			
@@ -134,23 +166,38 @@ class EditAlbumDialog extends Component {
 			<div className="form-row">
 				<TextField
 					floatingLabelText="Rok wydawnictwa"
-					onChange={event => this.setState({pubYear: event.target.value})}
-					defaultValue={this.state.pubYear}
+					onChange={event => this.setState({
+						form: { 
+							...this.state.form,
+							pubYear: event.target.value
+						} 
+					})}
+					defaultValue={this.state.form.pubYear}
 				/>
 				<AutoComplete
 					floatingLabelText="Wydawca"
-					onUpdateInput={value => this.setState({publisher: value})}
+					onUpdateInput={value => this.setState({
+						form: { 
+							...this.state.form,
+							publisher: value
+						} 
+					})}
 					filter={AutoComplete.caseInsensitiveFilter}
 					dataSource={this._getDataSource('publisher')}
 					maxSearchResults={5}
-					searchText={this.state.publisher}
+					searchText={this.state.form.publisher}
 				/>
 			</div>
 			<TextField
 				floatingLabelText="Opis"
 				fullWidth={true}
-				onChange={event => this.setState({desc: event.target.value})}
-				defaultValue={this.state.desc}
+				onChange={event => this.setState({
+					form: { 
+						...this.state.form,
+						desc: event.target.value
+					} 
+				})}
+				defaultValue={this.state.form.desc}
 			/>
 		</div>);
 	}
@@ -164,6 +211,10 @@ class EditAlbumDialog extends Component {
 			all.push(item[key]);
 			return all;
 		}, [])
+	}
+
+	_wait(show = false) {
+		this.setState({wait: show});
 	}
 }
 
