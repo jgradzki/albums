@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { map, filter, slice } from 'lodash';
+import { map, filter, slice, findIndex, forEach, orderBy } from 'lodash';
 import './AlbumList.css';
 import {
 	Table,
@@ -18,9 +18,31 @@ import ActionDelete from 'material-ui/svg-icons/action/delete';
 import ImageEdit from 'material-ui/svg-icons/image/edit';
 import NavigationChevronLeft from 'material-ui/svg-icons/navigation/chevron-left';
 import NavigationChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
+import NavigationArrowDownward from 'material-ui/svg-icons/navigation/arrow-downward';
+import NavigationArrowUpward from 'material-ui/svg-icons/navigation/arrow-upward';
+import Badge from 'material-ui/Badge';
 import {blue500, red500} from 'material-ui/styles/colors';
 
+const badgeStyle = {
+	WebkitTouchCallout: 'none', /* iOS Safari */
+	WebkitUserSelect: 'none', /* Safari */
+	KhtmlUserSelect: 'none', /* Konqueror HTML */
+	MozUserSelect: 'none', /* Firefox */
+	msUserSelect: 'none', /* Internet Explorer/Edge */
+	userSelect: 'none'
+}
+
 class AlbumList extends Component {
+	headers = [
+		{name: 'band', text: 'Zespół', order: true},
+		{name: 'title', text: 'Tytuł albumu', order: true},
+		{name: 'year', text: 'Rok premiery', order: true},
+		{name: 'format', text: 'Format wydania', order: true},
+		{name: 'pubYear', text: 'Rok wydawnictwa', order: true},
+		{name: 'publisher', text: 'Wydawca', order: true},
+		{name: 'desc', text: 'Opis', order: false},
+	]
+
 	state = {
 		height: window.innerHeight,
 		error: false,
@@ -96,20 +118,14 @@ class AlbumList extends Component {
 			<div className="AlbumList">
 				<Table 
 					selectable={false} 
-					height={`${this.state.height-327}px`} 
+					height={`${this.state.height-335}px`} 
 					fixedHeader={true}
 					fixedFooter={true}
 				>
 					<TableHeader>
 						<TableRow>
 							<TableHeaderColumn>No.</TableHeaderColumn>
-							<TableHeaderColumn>Zespół</TableHeaderColumn>
-							<TableHeaderColumn>Tytuł albumu</TableHeaderColumn>
-							<TableHeaderColumn>Rok premiery</TableHeaderColumn>
-							<TableHeaderColumn>Format wydania</TableHeaderColumn>
-							<TableHeaderColumn>Rok wydawnictwa</TableHeaderColumn>
-							<TableHeaderColumn>Wydawca</TableHeaderColumn>
-							<TableHeaderColumn>Opis</TableHeaderColumn>
+							{this._renderHeaderContent()}
 							<TableHeaderColumn>Akcja</TableHeaderColumn>
 						</TableRow>
 					</TableHeader>
@@ -181,6 +197,8 @@ class AlbumList extends Component {
 			)
 		}
 
+		toShow = this._orderBy(toShow);
+
 		const length = toShow.length;
 		const start = 0 + (perPage * (page - 1));
 		const end = perPage + (perPage * (page - 1));
@@ -190,6 +208,25 @@ class AlbumList extends Component {
 		}
 
 		return {items: toShow, pagesCount: Math.ceil(length / perPage)};
+	}
+
+	_orderBy(list) {
+		const { order } = this.props.list;
+		const names = [];
+		const orders = [];
+
+		forEach(order, o => {
+			names.push(o.name);
+			orders.push(o.order)
+		});
+
+		list = orderBy(
+			list,
+			names,
+			orders
+		);
+
+		return list;
 	}
 
 	_onPageInputChange(page) {
@@ -229,6 +266,81 @@ class AlbumList extends Component {
 		});
 	}
 
+	_renderHeaderContent() {
+		return map(this.headers, header => {
+			const data = this._getOrderData(header.name);
+
+			if (!data || !data.Image || !data.number) {
+				return (
+					<TableHeaderColumn key={header.name}>
+						<div 
+							onClick={() => header.order ? this.props.switchOrder(header.name) : null} 
+							className="header"
+							style={header.order ? {cursor: 'pointer'} : {}}
+						>
+							<div className="headerText">
+								<span className="noselect">{header.text}</span>
+							</div>
+							<div className="headerIcon"></div>
+						</div>
+					</TableHeaderColumn>
+				);
+			}
+
+			const { Image, number } = data;
+
+			return (
+				<TableHeaderColumn key={header.name}>
+					<div 
+						onClick={() => this.props.switchOrder(header.name)} 
+						className="header"
+						style={{cursor: 'pointer'}}
+					>
+						<div className="headerText">
+							<Badge
+								badgeContent={number}
+								primary={true}
+								className="badge"
+								badgeStyle={badgeStyle}
+							>
+								<span className="noselect">{header.text}</span>
+							</Badge>
+						</div>
+						<div className="headerIcon">{Image}</div>
+					</div>
+				</TableHeaderColumn>
+			);
+		});
+	}
+
+	_getOrderData(categoryName) {
+		const { order } = this.props.list;
+		const categoryIndex = findIndex(order, item => item.name === categoryName);
+
+		if (!order || !categoryName || categoryIndex === -1) {
+			return null;
+		}
+
+		const category = order[categoryIndex];
+		const viewBox = '0 0 32 32';
+
+		if (category.order === 'desc') {
+			return {
+				Image: <NavigationArrowDownward color={blue500} viewBox={viewBox} />,
+				number: categoryIndex+1
+			}
+		}
+
+		if (category.order === 'asc') {
+			return {
+				Image: <NavigationArrowUpward color={blue500} viewBox={viewBox} />,
+				number: categoryIndex+1
+			}
+		}
+
+		return null;
+	}
+
 	_remove(id) {
 		fetch("/api/item", {
 			method: 'DELETE',
@@ -246,14 +358,14 @@ class AlbumList extends Component {
 	}
 }
 
-let mapStateToProps = (state, props) => {
+const mapStateToProps = (state, props) => {
 	return {
 		list: state.list,
 		searchText: state.appState.searchText
 	};
 };
 
-let mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch) => {
 	return {
 		setLoaded: items => {
 			dispatch({type: 'setLoaded', items}); 
@@ -269,6 +381,9 @@ let mapDispatchToProps = (dispatch) => {
 		},
 		setPage: page => {
 			dispatch({type: 'setPage', page}); 		
+		},
+		switchOrder: category => {
+			dispatch({type: 'switchOrder', category}); 		
 		}
 	};
 };

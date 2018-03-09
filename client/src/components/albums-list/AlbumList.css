@@ -3,7 +3,6 @@
 }
 
 .AlbumList {
-
 }
 
 .footer {
@@ -20,7 +19,7 @@
 }
 .footer .per-page .input-field {
 	 align-self: center;
-	 margin-left: 10px
+	 margin-left: 10px;
 }
 
 .footer .pages {
@@ -34,11 +33,36 @@
 }
 
 .footer .pages .input-field {
-	 align-self: center;
-	 margin-left: 10px
+	align-self: center;
+	margin-left: 10px;
 }
 
 .footer .pages .nav {
-	 align-self: center;
-	 margin-right: 15px
+	align-self: center;
+	margin-right: 15px;
+}
+
+.header {
+	display: flex;
+	flex-direction: row;
+	height: 50px !important;
+}
+
+.headerIcon {
+	align-self: center;
+	width: 14px;
+	height: 14px;
+}
+
+.headerText {
+	align-self: center;
+}
+
+.badge {
+	padding: 20px 24px 20px 0px !important;
+}
+
+
+th {
+	height: 70px !important;
 }

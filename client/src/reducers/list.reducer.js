@@ -1,4 +1,4 @@
-import { filter, slice, map } from 'lodash';
+import { filter, slice, map, findIndex } from 'lodash';
 
 const listReducer = (state = {}, action) => {
 	switch (action.type) {
@@ -55,10 +55,35 @@ const listReducer = (state = {}, action) => {
 				...state,
 				page: action.page
 			}
+		case 'switchOrder':
+			return switchOrder(state, action);
 		default:
 			return state;
 	}
 };
+
+const switchOrder = (state, action) => {
+	if (!action.category) {
+		return state;
+	}
+
+	const order = slice(state.order);
+	const categoryIndex = findIndex(order, o => o.name === action.category);
+	const category = order[categoryIndex];
+
+	if (!category) {
+		order.push({name: action.category, order: 'desc'})
+	} else if (category.order === 'desc') {
+		category.order = 'asc';
+	} else if (category.order === 'asc') {
+		order.splice(categoryIndex, 1);
+	}
+
+	return {
+		...state,
+		order
+	};
+}
 
 
 export default listReducer;

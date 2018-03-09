@@ -140,14 +140,14 @@ class AddAlbumDialog extends Component {
 	}
 }
 
-let mapStateToProps = (state, props) => {
+const mapStateToProps = (state, props) => {
 	return {
 		show: state.appState.showAddDialog || false,
 		items: state.list.items || {}
 	};
 };
 
-let mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch) => {
 	return {
 		hideAddDialog: () => {
 			dispatch({type: 'hideAddDialog'}); 

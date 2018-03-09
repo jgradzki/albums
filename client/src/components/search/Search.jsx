@@ -15,13 +15,13 @@ class Search extends Component {
 	}
 }
 
-let mapStateToProps = (state, props) => {
+const mapStateToProps = (state, props) => {
 	return {
 		text: state.appState.searchText || ''
 	};
 };
 
-let mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch) => {
 	return {
 		setSearchText: text => {
 			dispatch({type: 'setSearchText', text}); 

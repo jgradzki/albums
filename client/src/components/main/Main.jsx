@@ -57,13 +57,13 @@ class Main extends Component {
 
 }
 
-let mapStateToProps = (state, props) => {
+const mapStateToProps = (state, props) => {
 	return {
 		items: state.list.items || {}
 	};
 };
 
-let mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch) => {
 	return {
 		showAddDialog: () => {
 			dispatch({type: 'showAddDialog'}); 

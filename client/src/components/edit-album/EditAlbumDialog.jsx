@@ -167,7 +167,7 @@ class EditAlbumDialog extends Component {
 	}
 }
 
-let mapStateToProps = (state, props) => {
+const mapStateToProps = (state, props) => {
 	return {
 		show: state.appState.showEditDialog || false,
 		item: find(state.list.items, album => album.id === state.appState.editId),
@@ -176,7 +176,7 @@ let mapStateToProps = (state, props) => {
 	};
 };
 
-let mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch) => {
 	return {
 		hideEditDialog: () => {
 			dispatch({type: 'hideEditDialog'}); 
