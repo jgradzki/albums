@@ -119,6 +119,7 @@ class AlbumList extends Component {
 
 	_renderList() {
 		const { page } = this.props.list;
+		const allItemsCount = this.props.list.items.length;
 		const { items, pagesCount } = this._getList();
 
 		return (
@@ -151,6 +152,9 @@ class AlbumList extends Component {
 											value={this.props.list.perPage || ''}
 											onChange={event => this._setPerPageCount(event.target.value)}
 										/>
+									</div>
+									<div className="text" style={{marginLeft: '35px'}}>
+										Wszystkich: {allItemsCount}
 									</div>
 								</div>
 								<div className="pages">

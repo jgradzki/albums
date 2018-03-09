@@ -30,7 +30,7 @@ class Main extends Component {
 					</div>
 					<RaisedButton label="Dodaj album" primary={true} onClick={() => this.props.showAddDialog()} style={{height: 'auto'}} />
 					<FlatButton label="Losuj: " onClick={() => this._draw()} /> 
-					<TextField id="drawn-count" value={this.state.drawCount} style={{width: '40px'}} onChange={event => this.setState({drawCount: parseInt(event.target.value, 10)})} />
+					<TextField id="drawn-count" value={this.state.drawCount} style={{width: '40px'}} onChange={event => this.setState({drawCount: event.target.value})} />
 					<FlatButton label="Resetuj" onClick={() => this.props.reset()} /> 
 					<AlbumList />
 					<Wait show={this.props.serverWait} />
@@ -43,7 +43,13 @@ class Main extends Component {
 
 	_draw() {
 		const { items } = this.props;
-		const count = (this.state.drawCount > items.length ? items.length : this.state.drawCount);
+		let drawCount = parseInt(this.state.drawCount, 10);
+
+		if (isNaN(drawCount)) {
+			drawCount = 1;
+		}
+
+		const count = (drawCount > items.length ? items.length : drawCount);
 		const drawn = [];
 
 		while (drawn.length < count) {
