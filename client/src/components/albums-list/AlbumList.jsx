@@ -89,9 +89,9 @@ class AlbumList extends Component {
 		}
 	}
 
-	_renderItem(item, number) {
-		return (<TableRow key={number}>
-			<TableRowColumn>{number}</TableRowColumn>
+	_renderItem(item) {
+		return (<TableRow key={item.number}>
+			<TableRowColumn>{item.number}</TableRowColumn>
 			<TableRowColumn>{item.band}</TableRowColumn>
 			<TableRowColumn>{item.title}</TableRowColumn>
 			<TableRowColumn>{item.year}</TableRowColumn>
@@ -137,7 +137,7 @@ class AlbumList extends Component {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{map(items, (item, number) => this._renderItem(item, number+1))}
+						{map(items, item => this._renderItem(item))}
 					</TableBody>
 					<TableFooter>
 						<TableRow>
@@ -167,7 +167,7 @@ class AlbumList extends Component {
 										<TextField 
 											id="page-number"
 											style={{width: '30px'}}
-											value={this.state.page}
+											value={(this.state.page > pagesCount ? pagesCount : this.state.page)}
 											onChange={event => this._onPageInputChange(event.target.value)}
 										/>
 									</div>
@@ -191,6 +191,11 @@ class AlbumList extends Component {
 		} else {
 			toShow = drawnItems;
 		}
+
+		toShow = map(toShow, (item, number) => ({
+			...item,
+			number: number + 1
+		}));
 
 		if (searchText) {
 			toShow = filter(

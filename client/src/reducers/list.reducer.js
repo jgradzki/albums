@@ -37,7 +37,8 @@ const listReducer = (state = {}, action) => {
 			return {
 				...state,
 				draw: true,
-				drawnItems: action.drawn
+				drawnItems: action.drawn,
+				page: 1
 			}
 		case 'reset': 
 			return {
