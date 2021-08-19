@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.post("/api/item", (req, res) => {
 	const itemData = req.body;
 	let id;
-	
+
  	do {
  		id = uuidv4();
  	} while (_.find(data, (item, key) => key === id));
@@ -34,7 +34,12 @@ app.post("/api/item", (req, res) => {
 		format: itemData.format || 'CD',
 		pubYear: itemData.pubYear || '',
 		publisher: itemData.publisher || '',
-		desc: itemData.desc || ''
+		desc: itemData.desc || '',
+		limited: itemData.limited || false,
+		limitedCount: itemData.limitedCount || 0,
+		numbered: itemData.numbered || false,
+		numberedCount: itemData.numberedCount || 0,
+		firstEdition: itemData.numberedCount || false,
  	}
 
  	data[id] = item;

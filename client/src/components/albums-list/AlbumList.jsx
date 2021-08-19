@@ -40,6 +40,7 @@ class AlbumList extends Component {
 		{name: 'format', text: 'Format wydania', order: true},
 		{name: 'pubYear', text: 'Rok wydawnictwa', order: true},
 		{name: 'publisher', text: 'Wydawca', order: true},
+		{name: 'additional', text: 'Dodatkowe dane', order: false},
 		{name: 'desc', text: 'Opis', order: false},
 	]
 
@@ -92,12 +93,39 @@ class AlbumList extends Component {
 	_renderItem(item) {
 		return (<TableRow key={item.number}>
 			<TableRowColumn>{item.index}</TableRowColumn>
-			<TableRowColumn>{item.band}</TableRowColumn>
-			<TableRowColumn>{item.title}</TableRowColumn>
-			<TableRowColumn>{item.year}</TableRowColumn>
-			<TableRowColumn>{item.format}</TableRowColumn>
-			<TableRowColumn>{item.pubYear}</TableRowColumn>
-			<TableRowColumn>{item.publisher}</TableRowColumn>
+			<TableRowColumn title={item.band}>{item.band}</TableRowColumn>
+			<TableRowColumn title={item.title}>{item.title}</TableRowColumn>
+			<TableRowColumn title={item.year}>{item.year}</TableRowColumn>
+			<TableRowColumn title={item.format}>{item.format}</TableRowColumn>
+			<TableRowColumn title={item.pubYear}>{item.pubYear}</TableRowColumn>
+			<TableRowColumn title={item.publisher}>{item.publisher}</TableRowColumn>
+			<TableRowColumn>
+				<p>
+					{
+						item.firstEdition ? 'Pierwsze wydanie' : 'Reedycja'
+					}
+				</p>
+				{
+					item.limited && (
+						<p>
+							Limitowane:{' '}
+							{
+								item.limitedCount ? item.limitedCount : '-'
+							}
+						</p>
+					)
+				}
+				{
+					item.numbered && (
+						<p>
+							Numerowane:{' '}
+							{
+								item.numberedCount ? item.numberedCount : '-'
+							}
+						</p>
+					)
+				}
+			</TableRowColumn>
 			<TableRowColumn
 				style={{
 					whiteSpace: "normal",

@@ -8,3 +8,15 @@
 	flex-direction: row;
 	justify-content: space-evenly;
 }
+
+.checkbox_container {
+	max-width: 300px;
+	height: 72px;
+	align-items: flex-end;
+	padding: 0 25px;
+}
+
+.checkbox_container > div:first-child {
+	margin-bottom: 10px;
+	flex-grow: 1.5;
+}

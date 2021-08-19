@@ -10,6 +10,7 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Wait from '../wait';
 import { formats } from '../../constants';
+import Checkbox from "material-ui/Checkbox";
 
 class EditAlbumDialog extends Component {
 	state = {
@@ -20,11 +21,16 @@ class EditAlbumDialog extends Component {
 			format: 'CD',
 			pubYear: '',
 			publisher: '',
-			desc: ''
+			desc: '',
+			limited: false,
+			limitedCount: 0,
+			numbered: false,
+			numberedCount: 0,
+			firstEdition: false,
 		},
 		wait: false
 	}
-	
+
 	componentDidUpdate(prevProps, prevState) {
 		if (!prevProps.show && this.props.show) {
 			this.setState({
@@ -36,7 +42,12 @@ class EditAlbumDialog extends Component {
 					format: this.props.item.format || '',
 					pubYear: this.props.item.pubYear || '',
 					publisher: this.props.item.publisher || '',
-					desc: this.props.item.desc || ''
+					desc: this.props.item.desc || '',
+					limited: this.props.item.limited || '',
+					limitedCount: this.props.item.limitedCount || '',
+					numbered: this.props.item.numbered || '',
+					numberedCount: this.props.item.numberedCount || '',
+					firstEdition: this.props.item.firstEdition || '',
 				}
 			});
 		}
@@ -86,9 +97,9 @@ class EditAlbumDialog extends Component {
 		fetch("/api/item", {
 			method: 'PUT',
 			body: JSON.stringify({
-				id: this.props.editId, 
+				id: this.props.editId,
 				item: this.state.form
-			}), 
+			}),
 			headers: new Headers({
 				'Content-Type': 'application/json'
 			})
@@ -115,10 +126,10 @@ class EditAlbumDialog extends Component {
 				<AutoComplete
 					floatingLabelText="Zespół"
 					onUpdateInput={value => this.setState({
-						form: { 
+						form: {
 							...this.state.form,
 							band: value
-						} 
+						}
 					})}
 					filter={AutoComplete.caseInsensitiveFilter}
 					dataSource={this._getDataSource('band')}
@@ -128,10 +139,10 @@ class EditAlbumDialog extends Component {
 				<AutoComplete
 					floatingLabelText="Tytuł albumu"
 					onUpdateInput={value => this.setState({
-						form: { 
+						form: {
 							...this.state.form,
 							title: value
-						} 
+						}
 					})}
 					filter={AutoComplete.caseInsensitiveFilter}
 					dataSource={this._getDataSource('title')}
@@ -143,10 +154,10 @@ class EditAlbumDialog extends Component {
 				<TextField
 					floatingLabelText="Rok premiery"
 					onChange={event => this.setState({
-						form: { 
+						form: {
 							...this.state.form,
 							year: event.target.value
-						} 
+						}
 					})}
 					defaultValue={this.state.form.year}
 				/>
@@ -154,33 +165,33 @@ class EditAlbumDialog extends Component {
 					floatingLabelText="Format wydania"
 					value={this.state.form.format}
 					onChange={(event, index, value) => this.setState({
-						form: { 
+						form: {
 							...this.state.form,
 							format: value
-						} 
+						}
 					})}
 				>
 					{map(formats, format => <MenuItem key={format} value={format} primaryText={format} />)}
-				</SelectField>			
+				</SelectField>
 			</div>
 			<div className="form-row">
 				<TextField
 					floatingLabelText="Rok wydawnictwa"
 					onChange={event => this.setState({
-						form: { 
+						form: {
 							...this.state.form,
 							pubYear: event.target.value
-						} 
+						}
 					})}
 					defaultValue={this.state.form.pubYear}
 				/>
 				<AutoComplete
 					floatingLabelText="Wydawca"
 					onUpdateInput={value => this.setState({
-						form: { 
+						form: {
 							...this.state.form,
 							publisher: value
-						} 
+						}
 					})}
 					filter={AutoComplete.caseInsensitiveFilter}
 					dataSource={this._getDataSource('publisher')}
@@ -188,14 +199,99 @@ class EditAlbumDialog extends Component {
 					searchText={this.state.form.publisher}
 				/>
 			</div>
+
+			<div className="form-row checkbox_container">
+				<Checkbox
+					label="Limitowane"
+					checked={this.state.form.limited}
+					onClick={() => this.setState({
+						form: {
+							...this.state.form,
+							limited: !this.state.form.limited,
+						}
+					})}
+				/>
+
+				{
+					this.state.form.limited && (
+						<TextField
+							floatingLabelText="Ilość"
+							type="number"
+							value={this.state.form.limitedCount}
+							onFocus={() => !this.state.form.limitedCount && this.setState({
+								form: {
+									...this.state.form,
+									limitedCount: '',
+								}
+							})}
+							onChange={event => this.setState({
+								form: {
+									...this.state.form,
+									limitedCount: Number(event.target.value),
+								}
+							})}
+						/>
+					)
+				}
+
+			</div>
+
+			<div className="form-row checkbox_container">
+				<Checkbox
+					label="Numerowane"
+					checked={this.state.form.numbered}
+					onClick={() => this.setState({
+						form: {
+							...this.state.form,
+							numbered: !this.state.form.numbered,
+						}
+					})}
+				/>
+
+				{
+					this.state.form.numbered && (
+						<TextField
+							floatingLabelText="Numer"
+							type="number"
+							value={this.state.form.numberedCount}
+							onFocus={() => !this.state.form.numberedCount && this.setState({
+								form: {
+									...this.state.form,
+									numberedCount: '',
+								}
+							})}
+							onChange={event => this.setState({
+								form: {
+									...this.state.form,
+									numberedCount: Number(event.target.value),
+								}
+							})}
+						/>
+					)
+				}
+			</div>
+
+			<div className="form-row checkbox_container">
+				<Checkbox
+					label="Pierwsze wydanie"
+					checked={this.state.form.firstEdition}
+					onClick={() => this.setState({
+						form: {
+							...this.state.form,
+							firstEdition: !this.state.form.firstEdition,
+						}
+					})}
+				/>
+			</div>
+
 			<TextField
 				floatingLabelText="Opis"
 				fullWidth={true}
 				onChange={event => this.setState({
-					form: { 
+					form: {
 						...this.state.form,
 						desc: event.target.value
-					} 
+					}
 				})}
 				defaultValue={this.state.form.desc}
 			/>
@@ -230,7 +326,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch) => {
 	return {
 		hideEditDialog: () => {
-			dispatch({type: 'hideEditDialog'}); 
+			dispatch({type: 'hideEditDialog'});
 		},
 		editItem: (item) => {
 			dispatch({type: 'editItem', item});
