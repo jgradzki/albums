@@ -91,14 +91,14 @@ class AlbumList extends Component {
 
 	_renderItem(item) {
 		return (<TableRow key={item.number}>
-			<TableRowColumn>{item.number}</TableRowColumn>
+			<TableRowColumn>{item.index}</TableRowColumn>
 			<TableRowColumn>{item.band}</TableRowColumn>
 			<TableRowColumn>{item.title}</TableRowColumn>
 			<TableRowColumn>{item.year}</TableRowColumn>
 			<TableRowColumn>{item.format}</TableRowColumn>
 			<TableRowColumn>{item.pubYear}</TableRowColumn>
 			<TableRowColumn>{item.publisher}</TableRowColumn>
-			<TableRowColumn 
+			<TableRowColumn
 				style={{
 					whiteSpace: "normal",
 					wordWrap: "break-word"
@@ -124,9 +124,9 @@ class AlbumList extends Component {
 
 		return (
 			<div className="AlbumList">
-				<Table 
-					selectable={false} 
-					height={`${this.state.height-335}px`} 
+				<Table
+					selectable={false}
+					height={`${this.state.height-335}px`}
 					fixedHeader={true}
 					fixedFooter={true}
 				>
@@ -146,12 +146,15 @@ class AlbumList extends Component {
 								<div className="per-page">
 									<div className="text">Na strone:</div>
 									<div className="input-field">
-										<TextField 
+										<TextField
 											id="per-page-count"
 											style={{width: '30px'}}
 											value={this.props.list.perPage || ''}
 											onChange={event => this._setPerPageCount(event.target.value)}
 										/>
+									</div>
+									<div className="text" style={{marginLeft: '35px'}}>
+										Znalezionych: {items.length}
 									</div>
 									<div className="text" style={{marginLeft: '35px'}}>
 										Wszystkich: {allItemsCount}
@@ -168,7 +171,7 @@ class AlbumList extends Component {
 									</div>
 									<div className="text">Strona</div>
 									<div className="input-field">
-										<TextField 
+										<TextField
 											id="page-number"
 											style={{width: '30px'}}
 											value={(this.state.page > pagesCount ? pagesCount : this.state.page)}
@@ -203,8 +206,8 @@ class AlbumList extends Component {
 
 		if (searchText) {
 			toShow = filter(
-				toShow, 
-				item => 
+				toShow,
+				item =>
 					(item.band.toLowerCase().search(searchText.toLowerCase()) > -1) ||
 					(item.title.toLowerCase().search(searchText.toLowerCase()) > -1) ||
 					(item.year.toLowerCase().search(searchText.toLowerCase()) > -1) ||
@@ -222,6 +225,11 @@ class AlbumList extends Component {
 		if (length > perPage) {
 			toShow = slice(toShow, start, end);
 		}
+
+		toShow = toShow.map((item, index) => ({
+			...item,
+			index: index + 1,
+		}))
 
 		return {items: toShow, pagesCount: Math.ceil(length / perPage)};
 	}
@@ -252,7 +260,7 @@ class AlbumList extends Component {
 
 	_setPerPageCount(count) {
 		count = parseInt(count, 10);
-		
+
 		if (isNaN(count)) {
 			count = null;
 		}
@@ -275,7 +283,7 @@ class AlbumList extends Component {
 		if (page > pagesCount) {
 			page = pagesCount;
 		}
-		
+
 		this.props.setPage(page);
 		this.setState({
 			page
@@ -289,8 +297,8 @@ class AlbumList extends Component {
 			if (!data || !data.Image || !data.number) {
 				return (
 					<TableHeaderColumn key={header.name}>
-						<div 
-							onClick={() => header.order ? this.props.switchOrder(header.name) : null} 
+						<div
+							onClick={() => header.order ? this.props.switchOrder(header.name) : null}
 							className="header"
 							style={header.order ? {cursor: 'pointer'} : {}}
 						>
@@ -307,8 +315,8 @@ class AlbumList extends Component {
 
 			return (
 				<TableHeaderColumn key={header.name}>
-					<div 
-						onClick={() => this.props.switchOrder(header.name)} 
+					<div
+						onClick={() => this.props.switchOrder(header.name)}
 						className="header"
 						style={{cursor: 'pointer'}}
 					>
@@ -362,7 +370,7 @@ class AlbumList extends Component {
 
 		fetch("/api/item", {
 			method: 'DELETE',
-			body: JSON.stringify({id}), 
+			body: JSON.stringify({id}),
 			headers: new Headers({
 				'Content-Type': 'application/json'
 			})
@@ -390,25 +398,25 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch) => {
 	return {
 		setLoaded: items => {
-			dispatch({type: 'setLoaded', items}); 
+			dispatch({type: 'setLoaded', items});
 		},
 		removeItem: id => {
-			dispatch({type: 'removeItem', id}); 
+			dispatch({type: 'removeItem', id});
 		},
 		editItem: id => {
-			dispatch({type: 'showEditDialog', id}); 
+			dispatch({type: 'showEditDialog', id});
 		},
 		setPerPage: count => {
-			dispatch({type: 'setPerPage', count}); 		
+			dispatch({type: 'setPerPage', count});
 		},
 		setPage: page => {
-			dispatch({type: 'setPage', page}); 		
+			dispatch({type: 'setPage', page});
 		},
 		switchOrder: category => {
-			dispatch({type: 'switchOrder', category}); 		
+			dispatch({type: 'switchOrder', category});
 		},
 		setServerWait: status => {
-			dispatch({type: 'setServerWait', status});			
+			dispatch({type: 'setServerWait', status});
 		}
 	};
 };
